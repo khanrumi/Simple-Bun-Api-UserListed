@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -69,7 +69,7 @@
         <div id="message"></div>
     </div>
 
-    <!-- Load the Supabase library -->
+    Load the Supabase library
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@latest"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -111,5 +111,93 @@
             });
         });
     </script>
+</body>
+</html>
+
+
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Submission Form</title>
+  <style>
+    #form-container { max-width: 400px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+    h1 { text-align: center; }
+    label { display: block; margin-top: 10px; }
+    input[type="text"], input[type="datetime-local"], input[type="file"] { width: 100%; padding: 8px; margin-top: 5px; }
+    button { width: 100%; padding: 10px; margin-top: 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background-color: #45a049; }
+    #message { margin-top: 10px; text-align: center; }
+    .success { color: green; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <div id="form-container">
+    <h1>User Submission Form</h1>
+    <form id="user-form">
+      <label for="name">Name:</label>
+      <input type="text" id="name" required>
+
+      <label for="location">Location:</label>
+      <input type="text" id="location" required>
+
+      <label for="joining-time">Joining Time:</label>
+      <input type="datetime-local" id="joining-time" required>
+
+      <label for="file-input">Upload File:</label>
+      <input type="file" id="file-input" required>
+
+      <button type="submit">Submit</button>
+    </form>
+    <div id="message"></div>
+  </div>
+
+  <script>
+    document.getElementById('user-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const location = document.getElementById('location').value;
+      const joiningTime = document.getElementById('joining-time').value;
+      const fileInput = document.getElementById('file-input');
+      const messageDiv = document.getElementById('message');
+
+      if (!fileInput.files.length) {
+        messageDiv.textContent = 'Please select a file.';
+        messageDiv.className = 'error';
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('location', location);
+      formData.append('joiningTime', joiningTime);
+      formData.append('file', file);
+
+      try {
+        const response = await fetch('http://localhost:3000/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const result = await response.json();
+
+        if (response.ok) {
+          messageDiv.textContent = 'User submitted successfully with file upload!';
+          messageDiv.className = 'success';
+          document.getElementById('user-form').reset();
+        } else {
+          throw new Error(result.error);
+        }
+      } catch (error) {
+        messageDiv.textContent = `Error: ${error.message}`;
+        messageDiv.className = 'error';
+      }
+    });
+  </script>
 </body>
 </html>
