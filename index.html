@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Submission Form</title>
+    <style>
+        /* Styling */
+        #form-container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        h1 {
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input[type="text"], input[type="datetime-local"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #message {
+            margin-top: 10px;
+            text-align: center;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div id="form-container">
+        <h1>User Submission Form</h1>
+        <form id="user-form">
+            <label for="name">Name:</label>
+            <input type="text" id="name" required>
+
+            <label for="location">Location:</label>
+            <input type="text" id="location" required>
+
+            <label for="joining-time">Joining Time:</label>
+            <input type="datetime-local" id="joining-time" required>
+
+            <button type="submit">Submit</button>
+        </form>
+
+        <div id="message"></div>
+    </div>
+
+    <!-- Load the Supabase library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@latest"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Supabase
+            const supabaseUrl = 'https://zpmbzvtclcpvaxnlhkfx.supabase.co';
+            const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpwbWJ6dnRjbGNwdmF4bmxoa2Z4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzAyNzcyMjYsImV4cCI6MjA0NTg1MzIyNn0.lphQkUDhgoJchh12LFwW9z2Qhcw3OnYbqQjUVn155CQ';
+            const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+            // Handle form submission
+            document.getElementById('user-form').addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                // Get form values
+                const name = document.getElementById('name').value;
+                const location = document.getElementById('location').value;
+                const joiningTime = document.getElementById('joining-time').value;
+
+                // Send data to Supabase
+                const { data, error } = await supabase
+                    .from('users')
+                    .insert([{ 
+                        name: name, 
+                        location: location, 
+                        joining_time: joiningTime 
+                    }]);
+
+                // Display success or error message
+                const messageDiv = document.getElementById('message');
+                messageDiv.className = ""; // Reset class for new messages
+
+                if (error) {
+                    messageDiv.textContent = `Error: ${error.message}`;
+                    messageDiv.classList.add("error");
+                } else {
+                    messageDiv.textContent = 'User submitted successfully!';
+                    messageDiv.classList.add("success");
+                    document.getElementById('user-form').reset(); // Reset the form
+                }
+            });
+        });
+    </script>
+</body>
+</html>
